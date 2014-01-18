@@ -37,6 +37,7 @@ import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -52,7 +53,7 @@ public class Freedom extends Application {
         );
 
         stage.setTitle("Freedom PSZT");
-        stage.getIcons().add(SquareSkin.crossImage);
+        stage.getIcons().add(SquareSkin.blackImage);
         stage.setScene(scene);
         stage.show();
     }
@@ -153,14 +154,14 @@ class StatusIndicator extends HBox {
     private void bindIndicatorFieldsToGame(Game game) {
         playerToken.imageProperty().bind(
                 Bindings.when(
-                        game.currentPlayerProperty().isEqualTo(Square.State.NOUGHT)
+                        game.currentPlayerProperty().isEqualTo(Square.State.WHITE)
                 )
                         .then(SquareSkin.whiteImage)
                         .otherwise(
                                 Bindings.when(
-                                        game.currentPlayerProperty().isEqualTo(Square.State.CROSS)
+                                        game.currentPlayerProperty().isEqualTo(Square.State.BLACK)
                                 )
-                                        .then(SquareSkin.crossImage)
+                                        .then(SquareSkin.blackImage)
                                         .otherwise((Image) null)
                         )
         );
@@ -185,8 +186,17 @@ class Game {
     private GameSkin skin;
     private Board board = new Board(this);
     private WinningStrategy winningStrategy = new WinningStrategy(board);
+    private Square lastPlacedSquare;
 
-    private ReadOnlyObjectWrapper<Square.State> currentPlayer = new ReadOnlyObjectWrapper<>(Square.State.CROSS);
+    public Square getLastPlacedSquare() {
+        return lastPlacedSquare;
+    }
+
+    public void setLastPlacedSquare(Square lastPlacedSquare) {
+        this.lastPlacedSquare = lastPlacedSquare;
+    }
+
+    private ReadOnlyObjectWrapper<Square.State> currentPlayer = new ReadOnlyObjectWrapper<>(Square.State.BLACK);
     public ReadOnlyObjectProperty<Square.State> currentPlayerProperty() {
         return currentPlayer.getReadOnlyProperty();
     }
@@ -233,8 +243,8 @@ class Game {
 
         switch (currentPlayer.get()) {
             case EMPTY:
-            case NOUGHT: currentPlayer.set(Square.State.CROSS); break;
-            case CROSS: currentPlayer.set(Square.State.NOUGHT); break;
+            case WHITE: currentPlayer.set(Square.State.BLACK); break;
+            case BLACK: currentPlayer.set(Square.State.WHITE); break;
         }
     }
 
@@ -248,11 +258,34 @@ class Game {
     }
 
     public void boardUpdated() {
-        checkForWinner();
+//        checkForWinner();
     }
 
     public Parent getSkin() {
         return skin;
+    }
+
+
+
+    public boolean canPlaceAnywhere() {
+        if(lastPlacedSquare == null) return true;   // Start of game, last placed square is null
+
+        Integer x = lastPlacedSquare.getLocation().getKey();
+        Integer y = lastPlacedSquare.getLocation().getValue();
+
+        if((x > 0 && board.getSquare(x - 1, y).getState().equals(Square.State.EMPTY)) ||  // left
+                (x > 0 && y < 9 && board.getSquare(x - 1, y + 1).getState().equals(Square.State.EMPTY)) ||   // down left
+                (y < 9 && board.getSquare(x, y + 1).getState().equals(Square.State.EMPTY)) ||    // down
+                (x < 9 && y < 9 && board.getSquare(x + 1, y + 1).getState().equals(Square.State.EMPTY)) ||   // down right
+                (x < 9 && board.getSquare(x + 1, y).getState().equals(Square.State.EMPTY)) ||   // right
+                (x < 9 && y > 0 && board.getSquare(x + 1, y - 1).getState().equals(Square.State.EMPTY)) ||   // up right
+                (y > 0 && board.getSquare(x, y - 1).getState().equals(Square.State.EMPTY)) ||   // up
+                (x > 0 && y > 0 && board.getSquare(x - 1, y - 1).getState().equals(Square.State.EMPTY))){   // up left
+            System.out.println("Has adjacent empty");
+            return false;
+        }
+        System.out.println("NO adjacent empty");
+        return true;
     }
 }
 
@@ -269,14 +302,14 @@ class GameSkin extends VBox {
 class WinningStrategy {
     private final Board board;
 
-    private static final int NOUGHT_WON = 3;
-    private static final int CROSS_WON = 30;
+    private static final int WHITE_WON = 3;
+    private static final int BLACK_WON = 30;
 
     private static final Map<Square.State, Integer> values = new HashMap<>();
     static {
         values.put(Square.State.EMPTY, 0);
-        values.put(Square.State.NOUGHT, 1);
-        values.put(Square.State.CROSS, 10);
+        values.put(Square.State.WHITE, 1);
+        values.put(Square.State.BLACK, 10);
     }
 
     public WinningStrategy(Board board) {
@@ -340,12 +373,12 @@ class WinningStrategy {
     }
 
     private boolean isWinning(int score) {
-        return score == NOUGHT_WON || score == CROSS_WON;
+        return score == WHITE_WON || score == BLACK_WON;
     }
 
     private Square.State winner(int score) {
-        if (score == NOUGHT_WON) return Square.State.NOUGHT;
-        if (score == CROSS_WON) return Square.State.CROSS;
+        if (score == WHITE_WON) return Square.State.WHITE;
+        if (score == BLACK_WON) return Square.State.BLACK;
 
         return Square.State.EMPTY;
     }
@@ -359,12 +392,11 @@ class Board {
     public Board(Game game) {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                squares[i][j] = new Square(game);
+                squares[i][j] = new Square(game, new Pair<>(i, j));
             }
         }
 
         skin = new BoardSkin(this);
-//        skin = new BoardSkinFreedom(this);
     }
 
     public Square getSquare(int i, int j) {
@@ -390,7 +422,7 @@ class BoardSkin extends GridPane {
 
 
 class Square {
-    enum State { EMPTY, NOUGHT, CROSS }
+    enum State { EMPTY, WHITE, BLACK}
 
     private final SquareSkin skin;
 
@@ -401,25 +433,42 @@ class Square {
     public State getState() {
         return state.get();
     }
+    public void setState(State newState){
+        state.set(newState);
+    }
+
+    private Pair<Integer, Integer> location;
 
     private final Game game;
 
-    public Square(Game game) {
+    public Square(Game game, Pair<Integer, Integer> location) {
         this.game = game;
+        this.location = location;
 
         skin = new SquareSkin(this);
     }
 
     public void pressed() {
-        if (!game.isGameOver() && state.get() == State.EMPTY) {
+        if(game.isGameOver()) return;
+        else if(state.get() == State.EMPTY && ((game.canPlaceAnywhere() || game.getLastPlacedSquare().isAdjacentTo(this)))) {
             state.set(game.getCurrentPlayer());
             game.boardUpdated();
             game.nextTurn();
+            game.setLastPlacedSquare(this);
         }
     }
 
     public Node getSkin() {
         return skin;
+    }
+
+    public Pair<Integer, Integer> getLocation() {
+        return location;
+    }
+
+    public boolean isAdjacentTo(Square square){
+        return Math.abs(location.getKey() - square.getLocation().getKey()) <= 1 &&
+                Math.abs(location.getValue() - square.getLocation().getValue()) <= 1;
     }
 }
 
@@ -429,7 +478,7 @@ class SquareSkin extends StackPane {
     static final Image whiteImage = new Image(
             "http://www.bgshop.com/img/v152007-main.jpg"
     );
-    static final Image crossImage = new Image(
+    static final Image blackImage = new Image(
             "http://www.bgshop.com/img/v152005-main.jpg"
     );
 
@@ -443,7 +492,7 @@ class SquareSkin extends StackPane {
         imageView.setFitWidth(squareSide);
 
         getChildren().setAll(imageView);
-//        setPrefSize(crossImage.getHeight() + 20, crossImage.getHeight() + 20);
+//        setPrefSize(blackImage.getHeight() + 20, blackImage.getHeight() + 20);
         setPrefSize(squareSide, squareSide);
         setMaxSize(squareSide, squareSide);
 
@@ -457,8 +506,8 @@ class SquareSkin extends StackPane {
             @Override public void changed(ObservableValue<? extends Square.State> observableValue, Square.State oldState, Square.State state) {
                 switch (state) {
                     case EMPTY: imageView.setImage(null); break;
-                    case NOUGHT: imageView.setImage(whiteImage); break;
-                    case CROSS: imageView.setImage(crossImage); break;
+                    case WHITE: imageView.setImage(whiteImage); break;
+                    case BLACK: imageView.setImage(blackImage); break;
                 }
             }
         });
