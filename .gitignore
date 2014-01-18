@@ -1,3 +1,4 @@
 workspace.xml
 tasks.xml
 *.class
+out/production/freedom_pszt/tictactoe-blueskin.css
