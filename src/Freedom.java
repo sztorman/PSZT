@@ -40,18 +40,18 @@ import javafx.stage.Stage;
 
 import java.util.*;
 
-public class TicTacToe extends Application {
+public class Freedom extends Application {
     @Override public void start(Stage stage) throws Exception {
         GameManager gameManager = new GameManager();
 
         Scene scene = gameManager.getGameScene();
         scene.getStylesheets().add(
                 getResource(
-                        "tictactoe-blueskin.css"
+                        "freedom-skin.css"
                 )
         );
 
-        stage.setTitle("Tic-Tac-Toe");
+        stage.setTitle("Freedom PSZT");
         stage.getIcons().add(SquareSkin.crossImage);
         stage.setScene(scene);
         stage.show();
@@ -62,7 +62,7 @@ public class TicTacToe extends Application {
     }
 
     public static void main(String[] args) {
-        Application.launch(TicTacToe.class);
+        Application.launch(Freedom.class);
     }
 }
 
@@ -424,6 +424,8 @@ class Square {
 }
 
 class SquareSkin extends StackPane {
+    private static double squareSide = 40;
+
     static final Image whiteImage = new Image(
             "http://www.bgshop.com/img/v152007-main.jpg"
     );
@@ -437,13 +439,13 @@ class SquareSkin extends StackPane {
         getStyleClass().add("square");
 
         imageView.setMouseTransparent(true);
-        imageView.setFitHeight(20);
-        imageView.setFitWidth(20);
+        imageView.setFitHeight(squareSide);
+        imageView.setFitWidth(squareSide);
 
         getChildren().setAll(imageView);
 //        setPrefSize(crossImage.getHeight() + 20, crossImage.getHeight() + 20);
-        setPrefSize(20, 20);
-        setMaxSize(20, 20);
+        setPrefSize(squareSide, squareSide);
+        setMaxSize(squareSide, squareSide);
 
         setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent mouseEvent) {

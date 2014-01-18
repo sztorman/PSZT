@@ -24,7 +24,7 @@
 * ensure the build system copies the file over to the output path.
 */
 .root {
--fx-background-color: midnightblue;
+-fx-background-color: #ffb070;
 -fx-padding: 30px;
 -fx-font-size: 20px;
 -fx-font-family: "Comic Sans MS";
