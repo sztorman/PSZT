@@ -155,7 +155,7 @@ class StatusIndicator extends HBox {
                 Bindings.when(
                         game.currentPlayerProperty().isEqualTo(Square.State.NOUGHT)
                 )
-                        .then(SquareSkin.noughtImage)
+                        .then(SquareSkin.whiteImage)
                         .otherwise(
                                 Bindings.when(
                                         game.currentPlayerProperty().isEqualTo(Square.State.CROSS)
@@ -354,16 +354,17 @@ class WinningStrategy {
 class Board {
     private final BoardSkin skin;
 
-    private final Square[][] squares = new Square[3][3];
+    private final Square[][] squares = new Square[10][10];
 
     public Board(Game game) {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
                 squares[i][j] = new Square(game);
             }
         }
 
         skin = new BoardSkin(this);
+//        skin = new BoardSkinFreedom(this);
     }
 
     public Square getSquare(int i, int j) {
@@ -379,13 +380,14 @@ class BoardSkin extends GridPane {
     BoardSkin(Board board) {
         getStyleClass().add("board");
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
                 add(board.getSquare(i, j).getSkin(), i, j);
             }
         }
     }
 }
+
 
 class Square {
     enum State { EMPTY, NOUGHT, CROSS }
@@ -422,11 +424,11 @@ class Square {
 }
 
 class SquareSkin extends StackPane {
-    static final Image noughtImage = new Image(
-            "http://icons.iconarchive.com/icons/double-j-design/origami-colored-pencil/128/green-cd-icon.png"
+    static final Image whiteImage = new Image(
+            "http://www.bgshop.com/img/v152007-main.jpg"
     );
     static final Image crossImage = new Image(
-            "http://icons.iconarchive.com/icons/double-j-design/origami-colored-pencil/128/blue-cross-icon.png"
+            "http://www.bgshop.com/img/v152005-main.jpg"
     );
 
     private final ImageView imageView = new ImageView();
@@ -435,9 +437,13 @@ class SquareSkin extends StackPane {
         getStyleClass().add("square");
 
         imageView.setMouseTransparent(true);
+        imageView.setFitHeight(20);
+        imageView.setFitWidth(20);
 
         getChildren().setAll(imageView);
-        setPrefSize(crossImage.getHeight() + 20, crossImage.getHeight() + 20);
+//        setPrefSize(crossImage.getHeight() + 20, crossImage.getHeight() + 20);
+        setPrefSize(20, 20);
+        setMaxSize(20, 20);
 
         setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent mouseEvent) {
@@ -449,7 +455,7 @@ class SquareSkin extends StackPane {
             @Override public void changed(ObservableValue<? extends Square.State> observableValue, Square.State oldState, Square.State state) {
                 switch (state) {
                     case EMPTY: imageView.setImage(null); break;
-                    case NOUGHT: imageView.setImage(noughtImage); break;
+                    case NOUGHT: imageView.setImage(whiteImage); break;
                     case CROSS: imageView.setImage(crossImage); break;
                 }
             }

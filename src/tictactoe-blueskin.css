@@ -50,12 +50,12 @@
 
 .board {
 -fx-background-color: slategrey;
--fx-hgap: 10px;
--fx-vgap: 10px;
+-fx-hgap: 2px;
+-fx-vgap: 2px;
 /**-fx-effect: dropshadow(gaussian, slategrey, 20, 0, 0, 0);*/ /* effect disabled as it causes texture tearing on java 8b79 ea for OS X*/
 }
 
 .square {
--fx-padding: 10px;
+-fx-padding: 0px;
 -fx-background-color: azure;
 }
