@@ -43,8 +43,8 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-public class Freedom extends Application {
-    @Override public void start(Stage stage) throws Exception {
+ /*  public class Freedom extends Application {
+  @Override public void start(Stage stage) throws Exception {
         GameManager gameManager = new GameManager();
 
         Scene scene = gameManager.getGameScene();
@@ -61,6 +61,7 @@ public class Freedom extends Application {
         stage.show();
     }
 
+
     private String getResource(String resourceName) {
         return getClass().getResource(resourceName).toExternalForm();
     }
@@ -69,6 +70,7 @@ public class Freedom extends Application {
         Application.launch(Freedom.class);
     }
 }
+ */
 
 class GameManager {
     private Scene gameScene;
