@@ -24,6 +24,7 @@
  * http://www.doublejdesign.co.uk/products-page/icons/origami-colour-pencil
  */
 
+import com.sun.tools.javac.resources.compiler;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -185,6 +186,11 @@ class StatusIndicator extends HBox {
 }
 
 class Game {
+
+    public enum LineDirection {
+        UP, UP_LEFT, LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, RIGHT, UP_RIGHT
+    }
+
     private GameSkin skin;
     private Board board = new Board(this);
     private WinningStrategy winningStrategy = new WinningStrategy(board);
@@ -283,11 +289,52 @@ class Game {
                 (x < 9 && y > 0 && board.getSquare(x + 1, y - 1).getState().equals(Square.State.EMPTY)) ||   // up right
                 (y > 0 && board.getSquare(x, y - 1).getState().equals(Square.State.EMPTY)) ||   // up
                 (x > 0 && y > 0 && board.getSquare(x - 1, y - 1).getState().equals(Square.State.EMPTY))){   // up left
-            System.out.println("Has adjacent empty");
+//            System.out.println("Has adjacent empty");
             return false;
         }
-        System.out.println("NO adjacent empty");
+//        System.out.println("NO adjacent empty");
         return true;
+    }
+
+    public void findLines(Square square) {
+        Map<LineDirection, Integer> directionValues = new HashMap<>();
+
+        for(LineDirection d : LineDirection.values()){
+            directionValues.put(d, count(square.getState(), d, square.getLocation().getKey(), square.getLocation().getValue()));
+        }
+
+        // Horizontal
+        if(directionValues.get(LineDirection.LEFT) + directionValues.get(LineDirection.RIGHT) - 1 == 4){
+            System.out.println("In horizontal line");
+        }
+        // Vertical
+        if(directionValues.get(LineDirection.UP) + directionValues.get(LineDirection.DOWN) - 1 == 4){
+            System.out.println("In vertical line");
+        }
+        // Diagonal up left, down right
+        if(directionValues.get(LineDirection.UP_LEFT) + directionValues.get(LineDirection.DOWN_RIGHT) - 1 == 4){
+            System.out.println("In diagonal line up left, down right");
+        }
+        // Diagonal up right, down left
+        if(directionValues.get(LineDirection.UP_RIGHT) + directionValues.get(LineDirection.DOWN_LEFT) - 1 == 4){
+            System.out.println("In diagonal line up right, down left");
+        }
+    }
+
+    private int count(Square.State state, LineDirection direction, int x, int y){
+//        System.out.println("Invoked count() for x = " + x + " y = " + y);
+        if(board.getSquare(x, y).getState() != state) return 0;
+        switch (direction) {
+            case LEFT:          if(x > 0) return 1 + count(state, direction, x - 1, y);
+            case DOWN_LEFT:     if(x > 0 && y < 9) return 1 + count(state, direction, x - 1, y + 1);
+            case DOWN:          if(y < 9) return 1 + count(state, direction, x, y + 1);
+            case DOWN_RIGHT:    if(x < 9 && y < 9) return 1 + count(state, direction, x + 1, y + 1);
+            case RIGHT:         if(x < 9) return 1 + count(state, direction, x + 1, y);
+            case UP_RIGHT:      if(x < 9 && y > 0) return 1 + count(state, direction, x + 1, y - 1);
+            case UP:            if(y > 0) return 1 + count(state, direction, x, y - 1);
+            case UP_LEFT:       if(x > 0 && y > 0) return 1 + count(state, direction, x - 1, y - 1);
+        }
+        return 0;
     }
 }
 
@@ -465,7 +512,7 @@ class Square {
             game.nextTurn();
             game.setLastPlacedSquare(this);
 
-
+            game.findLines(this);
 //            ((GameSkin)game.getSkin()).add(new Button());
         }
     }
