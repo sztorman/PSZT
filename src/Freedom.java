@@ -185,6 +185,7 @@ class StatusIndicator extends HBox {
 
 class Game {
 
+
     public enum LineDirection {
         UP, UP_LEFT, LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, RIGHT, UP_RIGHT
     }
@@ -204,7 +205,7 @@ class Game {
         this.lastPlacedSquare = lastPlacedSquare;
     }
 
-    private ReadOnlyObjectWrapper<Square.State> currentPlayer = new ReadOnlyObjectWrapper<>(Square.State.BLACK);
+    private ReadOnlyObjectWrapper<Square.State> currentPlayer = new ReadOnlyObjectWrapper<>(Square.State.WHITE);
     public ReadOnlyObjectProperty<Square.State> currentPlayerProperty() {
         return currentPlayer.getReadOnlyProperty();
     }
@@ -231,6 +232,10 @@ class Game {
     }
     public boolean isGameOver() {
         return gameOver.get();
+    }
+
+    public void pressSquare(int[] coordinates) {
+        board.getSquare(coordinates[0], coordinates[1]).pressed();
     }
 
     public Game(GameManager gameManager) {
@@ -515,23 +520,23 @@ class Square {
     }
 
     public void pressed() {
-        if(game.isGameOver()) return;
-        else if(state.get() == State.EMPTY && ((game.canPlaceAnywhere() || game.getLastPlacedSquare().isAdjacentTo(this)))) {
+        if(!game.isGameOver() && state.get() == State.EMPTY && ((game.canPlaceAnywhere() || game.getLastPlacedSquare().isAdjacentTo(this)))) {
             state.set(game.getCurrentPlayer());
+            System.out.print(state.get() == State.WHITE ? "USER: " : "");
             game.boardUpdated();
             game.nextTurn();
             game.setLastPlacedSquare(this);
-
             game.findLines(this);
+            System.out.println("Placed pionek in x = " + location.getKey() + " y = " + location.getValue());
+
             GameEngine engine = new GameEngine();
-//            Line line = new Line(20, 20, 100, 200);
-//
-//            ((GameSkin)game.getSkin()).add(line);
-            int[] result;
-            result = new int[2];
             if(game.getCurrentPlayer().equals(State.BLACK)){
-                    result = engine.makeMove(game);
+                int[] result = engine.makeMove(game);
+                System.out.print("  AI: makeMove() returned x = " + result[0] + " y = " + result[1] + ". Placing pionek... ");
+                game.pressSquare(result);
             }
+        } else {
+            System.out.println("Unable to place pionek");
         }
     }
 
