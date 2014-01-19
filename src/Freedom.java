@@ -24,12 +24,10 @@
  * http://www.doublejdesign.co.uk/products-page/icons/origami-colour-pencil
  */
 
-import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.*;
 import javafx.event.*;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -37,10 +35,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Line;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -200,6 +194,8 @@ class Game {
     private WinningStrategy winningStrategy = new WinningStrategy(board);
     private Square lastPlacedSquare;
 
+    private List<ConnectingLine> lines;
+
     public Square getLastPlacedSquare() {
         return lastPlacedSquare;
     }
@@ -244,6 +240,7 @@ class Game {
         );
 
         skin = new GameSkin(gameManager, this);
+        lines = new ArrayList<>();
     }
 
     public Board getBoard() {
@@ -277,6 +274,10 @@ class Game {
         return skin;
     }
 
+    public void addLine(ConnectingLine line){
+        lines.add(line);
+        skin.addLine(line);
+    }
 
 
     public boolean canPlaceAnywhere() {
@@ -301,44 +302,49 @@ class Game {
     }
 
     public void findLines(Square square) {
-        Map<LineDirection, Integer> directionValues = new HashMap<>();
+        Map<LineDirection, MyPair> directionValues = new HashMap<>();
 
         for(LineDirection d : LineDirection.values()){
-            directionValues.put(d, count(square.getState(), d, square.getLocation().getKey(), square.getLocation().getValue()));
+            directionValues.put(d, count(square.getState(), d, square.getLocation().getKey(), square.getLocation().getValue(), square));
         }
 
         // Horizontal
-        if(directionValues.get(LineDirection.LEFT) + directionValues.get(LineDirection.RIGHT) - 1 == 4){
+        if(directionValues.get(LineDirection.LEFT).getFirst() + directionValues.get(LineDirection.RIGHT).getFirst() - 1 == 4){
             System.out.println("In horizontal line");
+            addLine(new ConnectingLine(directionValues.get(LineDirection.LEFT).getSecond(), directionValues.get(LineDirection.RIGHT).getSecond()));
         }
         // Vertical
-        if(directionValues.get(LineDirection.UP) + directionValues.get(LineDirection.DOWN) - 1 == 4){
+        if(directionValues.get(LineDirection.UP).getFirst() + directionValues.get(LineDirection.DOWN).getFirst() - 1 == 4){
             System.out.println("In vertical line");
+            addLine(new ConnectingLine(directionValues.get(LineDirection.UP).getSecond(), directionValues.get(LineDirection.DOWN).getSecond()));
         }
         // Diagonal up left, down right
-        if(directionValues.get(LineDirection.UP_LEFT) + directionValues.get(LineDirection.DOWN_RIGHT) - 1 == 4){
+        if(directionValues.get(LineDirection.UP_LEFT).getFirst() + directionValues.get(LineDirection.DOWN_RIGHT).getFirst() - 1 == 4){
             System.out.println("In diagonal line up left, down right");
+            addLine(new ConnectingLine(directionValues.get(LineDirection.UP_LEFT).getSecond(), directionValues.get(LineDirection.DOWN_RIGHT).getSecond()));
         }
         // Diagonal up right, down left
-        if(directionValues.get(LineDirection.UP_RIGHT) + directionValues.get(LineDirection.DOWN_LEFT) - 1 == 4){
+        if(directionValues.get(LineDirection.UP_RIGHT).getFirst() + directionValues.get(LineDirection.DOWN_LEFT).getFirst() - 1 == 4){
             System.out.println("In diagonal line up right, down left");
+            addLine(new ConnectingLine(directionValues.get(LineDirection.UP_RIGHT).getSecond(), directionValues.get(LineDirection.DOWN_LEFT).getSecond()));
         }
     }
 
-    private int count(Square.State state, LineDirection direction, int x, int y){
+    private MyPair count(Square.State state, LineDirection direction, int x, int y, Square previousSquare){
 //        System.out.println("Invoked count() for x = " + x + " y = " + y);
-        if(board.getSquare(x, y).getState() != state) return 0;
+        Square currentSquare = board.getSquare(x, y);
+        if(currentSquare.getState() != state) return new MyPair(0, previousSquare);
         switch (direction) {
-            case LEFT:          if(x > 0) return 1 + count(state, direction, x - 1, y);
-            case DOWN_LEFT:     if(x > 0 && y < 9) return 1 + count(state, direction, x - 1, y + 1);
-            case DOWN:          if(y < 9) return 1 + count(state, direction, x, y + 1);
-            case DOWN_RIGHT:    if(x < 9 && y < 9) return 1 + count(state, direction, x + 1, y + 1);
-            case RIGHT:         if(x < 9) return 1 + count(state, direction, x + 1, y);
-            case UP_RIGHT:      if(x < 9 && y > 0) return 1 + count(state, direction, x + 1, y - 1);
-            case UP:            if(y > 0) return 1 + count(state, direction, x, y - 1);
-            case UP_LEFT:       if(x > 0 && y > 0) return 1 + count(state, direction, x - 1, y - 1);
+            case LEFT:          if(x > 0) return count(state, direction, x - 1, y, currentSquare).incrementFirst(); break;
+            case DOWN_LEFT:     if(x > 0 && y < 9) return count(state, direction, x - 1, y + 1, currentSquare).incrementFirst(); break;
+            case DOWN:          if(y < 9) return count(state, direction, x, y + 1, currentSquare).incrementFirst(); break;
+            case DOWN_RIGHT:    if(x < 9 && y < 9) return count(state, direction, x + 1, y + 1, currentSquare).incrementFirst(); break;
+            case RIGHT:         if(x < 9) return count(state, direction, x + 1, y, currentSquare).incrementFirst(); break;
+            case UP_RIGHT:      if(x < 9 && y > 0) return count(state, direction, x + 1, y - 1, currentSquare).incrementFirst(); break;
+            case UP:            if(y > 0) return count(state, direction, x, y - 1, currentSquare).incrementFirst(); break;
+            case UP_LEFT:       if(x > 0 && y > 0) return count(state, direction, x - 1, y - 1, currentSquare).incrementFirst(); break;
         }
-        return 0;
+        return new MyPair(1, previousSquare);
     }
 }
 
@@ -354,7 +360,7 @@ class GameSkin extends VBox {
     }
 
 
-    public void add(Node e){
+    public void addLine(Node e){
         anchorPane.getChildren().add(e);
     }
 }
@@ -533,6 +539,14 @@ class Square {
         return skin;
     }
 
+    public double getPhysicalCenterX(){
+        return skin.getPhysicalCenterX();
+    }
+
+    public double getPhysicalCenterY(){
+        return skin.getPhysicalCenterY();
+    }
+
     public Pair<Integer, Integer> getLocation() {
         return location;
     }
@@ -546,11 +560,11 @@ class Square {
 class SquareSkin extends StackPane {
     private static double squareSide = 40;
 
-    static final Image whiteImage = new Image(
-            "http://www.bgshop.com/img/v152007-main.jpg"
+    final static Image whiteImage = new Image(
+            Main.class.getResource("white.png").toExternalForm()
     );
-    static final Image blackImage = new Image(
-            "http://www.bgshop.com/img/v152005-main.jpg"
+    final static Image blackImage = new Image(
+            Main.class.getResource("black.png").toExternalForm()
     );
 
     private final ImageView imageView = new ImageView();
@@ -582,5 +596,13 @@ class SquareSkin extends StackPane {
                 }
             }
         });
+    }
+
+    public double getPhysicalCenterX(){
+        return getLayoutX() + squareSide / 2;
+    }
+
+    public double getPhysicalCenterY(){
+        return getLayoutY() + squareSide / 2;
     }
 }
