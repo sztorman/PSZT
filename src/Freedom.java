@@ -24,7 +24,6 @@
  * http://www.doublejdesign.co.uk/products-page/icons/origami-colour-pencil
  */
 
-import com.sun.tools.javac.resources.compiler;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;

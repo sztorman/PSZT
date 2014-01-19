@@ -114,7 +114,7 @@ public class GameEngine implements ValueFunction {
         for (int i = lastX -1;i<lastX + 1;i++)
             for (int j = lastY -1; j<lastY +1;j++ ){
 
-                if ((i<0)||(j<0) || (i>10) || (j>10) || (i==lastX) || (j==lastY) ){
+                if ((i<0)||(j<0) || (i>9) || (j>9) || (i==lastX) || (j==lastY) ){
 
                 } else {
                     minimax = new MinMax();
