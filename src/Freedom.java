@@ -29,6 +29,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.*;
 import javafx.event.*;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -55,6 +56,7 @@ public class Freedom extends Application {
         stage.setTitle("Freedom PSZT");
         stage.getIcons().add(SquareSkin.blackImage);
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 
@@ -290,12 +292,19 @@ class Game {
 }
 
 class GameSkin extends VBox {
+    private AnchorPane anchorPane = new AnchorPane();
     GameSkin(GameManager gameManager, Game game) {
+        anchorPane.getChildren().add(game.getBoard().getSkin());
         getChildren().addAll(
-                game.getBoard().getSkin(),
+                anchorPane,
                 new StatusIndicator(game),
                 new GameControls(gameManager, game)
         );
+    }
+
+
+    public void add(Node e){
+        anchorPane.getChildren().add(e);
     }
 }
 
@@ -455,6 +464,9 @@ class Square {
             game.boardUpdated();
             game.nextTurn();
             game.setLastPlacedSquare(this);
+
+
+//            ((GameSkin)game.getSkin()).add(new Button());
         }
     }
 
