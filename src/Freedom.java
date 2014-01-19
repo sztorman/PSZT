@@ -37,6 +37,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -514,7 +517,12 @@ class Square {
             game.setLastPlacedSquare(this);
 
             game.findLines(this);
-//            ((GameSkin)game.getSkin()).add(new Button());
+//            Line line = new Line(20, 20, 100, 200);
+//
+//            ((GameSkin)game.getSkin()).add(line);
+            if(game.getCurrentPlayer().equals(State.BLACK)){
+                // Tutaj powinien być wywołany algorytm minmax dla gracza, który jest w if'ie
+            }
         }
     }
 

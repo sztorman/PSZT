@@ -13,11 +13,7 @@ public class Main extends Application {
         gameManager = new GameManager();
 
         Scene scene = gameManager.getGameScene();
-        scene.getStylesheets().add(
-                getResource(
-                        "freedom-skin.css"
-                )
-        );
+        scene.getStylesheets().add(getResource("freedom-skin.css"));
 
         stage.setTitle("Freedom PSZT");
         stage.getIcons().add(SquareSkin.blackImage);
