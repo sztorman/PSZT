@@ -99,11 +99,12 @@ public class GameEngine implements ValueFunction {
 
     }
 
-    public int[] makeMove(Board board, GameManager gameManager){
+    public int[] makeMove(GameManager gameManager){
 
         int value = 0;
         int depth = 5;
         int miniMaxResult;
+        Board board = gameManager.getGame().getBoard();
         int lastX = gameManager.getGame().getLastPlacedSquare().getLocation().getKey();
         int lastY = gameManager.getGame().getLastPlacedSquare().getLocation().getValue();
         int[] result;
