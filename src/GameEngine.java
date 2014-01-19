@@ -22,7 +22,7 @@ public class GameEngine implements ValueFunction {
         y1 = y-3;
         for (int i = x-3;i<x+3;i++){
 
-                if ((x>=0 && y1>=0) && (x<=10 && y1 <= 10)){
+                if ((i>=0 && y1>=0) && (i< 10 && y1 < 10)){
                     if (localBoard.getSquare(i,y1).equals(Square.State.BLACK)) black++;
                     else white++;
                 }
@@ -39,7 +39,7 @@ public class GameEngine implements ValueFunction {
         y1 = y+3;
         for (int i = x-3;i<x+3;i++){
 
-            if ((x>=0 && y1>=0) && (x<=10 && y1 <= 10)){
+            if ((i>=0) && (y1>=0) && (i<10) && (y1 < 10)){
                 if (localBoard.getSquare(i,y1).equals(Square.State.BLACK)) black++;
                 else white++;
             }
@@ -56,7 +56,7 @@ public class GameEngine implements ValueFunction {
 
         for (int i = x-3;i<x+3;i++){
 
-            if ((x>=0 && y1>=0) && (x<=10 && y1 <= 10)){
+            if ((i>=0 && y1>=0) && (i<10 && y1 < 10)){
                 if (localBoard.getSquare(i,y1).equals(Square.State.BLACK)) black++;
                 else white++;
             }
@@ -69,7 +69,7 @@ public class GameEngine implements ValueFunction {
 
         for (int i = y-3;i<y+3;i++){
 
-            if ((x>=0 && y1>=0) && (x<=10 && y1 <= 10)){
+            if ((i>=0 && y1>=0) && (i<10 && y1 < 10)){
                 if (localBoard.getSquare(i,y1).equals(Square.State.BLACK)) black++;
                 else white++;
             }
@@ -99,14 +99,14 @@ public class GameEngine implements ValueFunction {
 
     }
 
-    public int[] makeMove(GameManager gameManager){
+    public int[] makeMove(Game game){
 
         int value = 0;
-        int depth = 5;
+        int depth = 3;
         int miniMaxResult;
-        Board board = gameManager.getGame().getBoard();
-        int lastX = gameManager.getGame().getLastPlacedSquare().getLocation().getKey();
-        int lastY = gameManager.getGame().getLastPlacedSquare().getLocation().getValue();
+        Board board = game.getBoard();
+        int lastX = game.getLastPlacedSquare().getLocation().getKey();
+        int lastY = game.getLastPlacedSquare().getLocation().getValue();
         int[] result;
 
         result = new int[2];

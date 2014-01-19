@@ -12,22 +12,17 @@ public class MinMax {
 
     private ArrayList<TreeNode> generateMove(int x, int y, Board board){
 
-        int[][] values = new int[10][10];
         ArrayList<TreeNode> row = new ArrayList<TreeNode>();
-
+        engine = new GameEngine();
 
 
         for (int i = 0;i<10;i++)
             for (int j=0;j<10;j++){
                 if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
 
-                    if (bestMove == 0){
                         row.add(new TreeNode(i, j, engine.checkValueOfArea(i, j, board)));
-                    } else {
-                        row.add(new TreeNode(i, j, engine.checkValueOfArea(i, j, board)));
-                    }
 
-                } else values[i][j] = 0;
+                }
             }
 
         return row;

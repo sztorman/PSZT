@@ -517,11 +517,14 @@ class Square {
             game.setLastPlacedSquare(this);
 
             game.findLines(this);
+            GameEngine engine = new GameEngine();
 //            Line line = new Line(20, 20, 100, 200);
 //
 //            ((GameSkin)game.getSkin()).add(line);
+            int[] result;
+            result = new int[2];
             if(game.getCurrentPlayer().equals(State.BLACK)){
-                // Tutaj powinien być wywołany algorytm minmax dla gracza, który jest w if'ie
+                    result = engine.makeMove(game);
             }
         }
     }
