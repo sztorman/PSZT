@@ -92,8 +92,8 @@ public class GameEngine implements ValueFunction {
 
         if (black>white){
 
-            if (black ==3) valueTemp=10;
-            else if (((0<black)&&(black<3))) valueTemp=black;
+            if (black ==3) valueTemp=20;
+            else if (((0<black)&&(black<3))) valueTemp=black*2;
 
         } else if (white>=black){
             if (white == 3) valueTemp = -6;
