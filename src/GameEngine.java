@@ -8,7 +8,7 @@ public class GameEngine implements ValueFunction {
     //2. Wstawienie pionka powoduje uzyskanie linii z więcej niż 4 kamieni - 0pkt.
     //3. Wstawienie pionka powoduje otrzymanie linii < 4 kamienie (odpowiednio 1, 2 pkt)
     //4. Wstawienie pionka powoduje zablokowanie przeciwinika 4 pknt
-    int value = -1;
+    int value = 0;
     private MinMax minimax;
 
 
@@ -16,6 +16,7 @@ public class GameEngine implements ValueFunction {
        Board localBoard = board;
        int black = 0;
        int white = 0;
+        int newValue = 0;
         int y1;
        int valueTemp;
         //sprawdzanie tablicy po skosie
@@ -23,8 +24,8 @@ public class GameEngine implements ValueFunction {
         for (int i = x-3;i<x+3;i++){
 
                 if ((i>=0 && y1>=0) && (i< 10 && y1 < 10)){
-                    if (localBoard.getSquare(i,y1).equals(Square.State.BLACK)) black++;
-                    else white++;
+                    if (localBoard.getSquare(i,y1).getState().equals(Square.State.BLACK)) black++;
+                    else if (localBoard.getSquare(i,y1).getState().equals(Square.State.WHITE)) white++;
                 }
 
             y1++;
@@ -40,8 +41,8 @@ public class GameEngine implements ValueFunction {
         for (int i = x-3;i<x+3;i++){
 
             if ((i>=0) && (y1>=0) && (i<10) && (y1 < 10)){
-                if (localBoard.getSquare(i,y1).equals(Square.State.BLACK)) black++;
-                else white++;
+                if (localBoard.getSquare(i,y1).getState().equals(Square.State.BLACK)) black++;
+                else if (localBoard.getSquare(i,y1).getState().equals(Square.State.WHITE)) white++;
             }
 
             y1--;
@@ -56,9 +57,9 @@ public class GameEngine implements ValueFunction {
 
         for (int i = x-3;i<x+3;i++){
 
-            if ((i>=0 && y1>=0) && (i<10 && y1 < 10)){
-                if (localBoard.getSquare(i,y1).equals(Square.State.BLACK)) black++;
-                else white++;
+            if ((i>=0 && y>=0) && (i<10 && y < 10)){
+                if (localBoard.getSquare(i,y).getState().equals(Square.State.BLACK)) black++;
+                else if (localBoard.getSquare(i,y).getState().equals(Square.State.WHITE)) white++;
             }
 
         }
@@ -69,9 +70,9 @@ public class GameEngine implements ValueFunction {
 
         for (int i = y-3;i<y+3;i++){
 
-            if ((i>=0 && y1>=0) && (i<10 && y1 < 10)){
-                if (localBoard.getSquare(i,y1).equals(Square.State.BLACK)) black++;
-                else white++;
+            if ((x>=0 && i>=0) && (x<10 && i < 10)){
+                if (localBoard.getSquare(x,i).getState().equals(Square.State.BLACK)) black++;
+                else if (localBoard.getSquare(x,i).getState().equals(Square.State.WHITE)) white++;
             }
 
         }
@@ -89,20 +90,26 @@ public class GameEngine implements ValueFunction {
 
         int valueTemp = 0;
 
-        if (black ==3) valueTemp=5;
-        else if ((0<black)&&(black<3)) valueTemp=black;
-        else if (black<3) valueTemp = 0;
-        else if (white == 3) valueTemp = 4;
-        else valueTemp = 0;
+        if (black>white){
 
-        value = Math.max(value, valueTemp);
+            if (black ==3) valueTemp=10;
+            else if (((0<black)&&(black<3))) valueTemp=black;
+
+        } else if (white>=black){
+            if (white == 3) valueTemp = -6;
+            else if (white == 2) valueTemp = -2;
+            else valueTemp = 0;
+        }
+       // else if (black<3) valueTemp = 0;
+
+        value += valueTemp;
 
     }
 
     public int[] makeMove(Game game){
 
         int value = 0;
-        int depth = 3;
+        int depth = 1;
         int miniMaxResult;
         Board board = game.getBoard();
         int lastX = game.getLastPlacedSquare().getLocation().getKey();
@@ -111,23 +118,57 @@ public class GameEngine implements ValueFunction {
 
         result = new int[2];
 
-        for (int i = lastX -1;i<lastX + 1;i++)
-            for (int j = lastY -1; j<lastY +1;j++ ){
+        int empty = 0;
+        int filled = 0;
 
-                if ((i<0)||(j<0) || (i>9) || (j>9) || (i==lastX) || (j==lastY) ){
+        for (int i = lastX-1;i<lastX+1;i++)
+            for (int j=lastY-1;j<lastY+1;j++){
+                if (i<0|| i>10 || j<0 || j>10 || board.getSquare(i,j).getState().equals(Square.State.BLACK) || board.getSquare(i,j).getState().equals(Square.State.WHITE) ){
 
-                } else {
-                    minimax = new MinMax();
-                    miniMaxResult = minimax.MinaMaxAlgorithm(depth,i,j,board, true);
-                    if (miniMaxResult>value){
+                    filled++;
+
+                } else if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)) empty++;
+            }
+
+        if (filled>0 && empty == 0) {
+
+            for (int i = 0;i<10;i++)
+                for (int j=0;j<10;j++){
+                    if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
+
+                        minimax = new MinMax();
+                        miniMaxResult = minimax.MinaMaxAlgorithm(depth,i,j, this.checkValueOfArea(i,j,game.getBoard()), board, true);
+                        if (miniMaxResult>=value){
+
+                            value = miniMaxResult;
+                            result[0] = i;
+                            result[1] = j;
+                        }
+
+                    }
+                }
+
+        } else {
+
+        for (int i = lastX -1;i<=lastX + 1;i++)
+            for (int j = lastY -1; j<=lastY +1;j++ ){
+
+                if (i>=0 && i<10 && j>=0 && j<10){
+                    if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
+
+                        minimax = new MinMax();
+                    miniMaxResult = minimax.MinaMaxAlgorithm(depth,i,j, this.checkValueOfArea(i,j,game.getBoard()), board, true);
+                    if (miniMaxResult>=value){
 
                         value = miniMaxResult;
                         result[0] = i;
                         result[1] = j;
                     }
                 }
+                }
 
             }
+        }
         return result;
 
     }
