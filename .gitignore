@@ -1,3 +1,5 @@
 workspace.xml
 tasks.xml
 out/
+.idea/inspectionProfiles
+.idea/dictionaries
