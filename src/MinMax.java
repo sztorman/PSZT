@@ -42,12 +42,10 @@ public class MinMax {
 
         for (int i = x-1;i<x+1;i++)
             for (int j=y-1;j<y+1;j++){
-                if (i>=0 && i<10 && j>=0 && j<10){
-                if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
+                if (i>=0 && i<10 && j>=0 && j<10 && board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
 
                         row.add(new TreeNode(i, j, engine.checkValueOfArea(i, j, board) + weight));
 
-                }
             }
             }
         }
@@ -75,8 +73,7 @@ public class MinMax {
         } else {
             bestValue= 1000;
             for (TreeNode node: generateMove(x, y, newBoardB, weight)){
-                value = MinaMaxAlgorithm(depth -1, node.getX(), node.getY(), node.getWeight(), newBoardB, true, alpha, beta);
-                alpha = Math.min(beta, MinaMaxAlgorithm(depth -1, node.getX(), node.getY(), node.getWeight(), newBoardB, false, alpha, beta));
+                beta = Math.min(beta, MinaMaxAlgorithm(depth -1, node.getX(), node.getY(), node.getWeight(), newBoardB, true, alpha, beta));
                 if (alpha>=beta){
                     return beta;
                 }
