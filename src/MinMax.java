@@ -20,34 +20,25 @@ public class MinMax {
         for (int i = x-1; i <= x+1; i++)
             for (int j = y-1; j <= y+1; j++){
                 if (i<0|| i>9 || j<0 || j>9 || board.getSquare(i,j).getState().equals(Square.State.BLACK) || board.getSquare(i,j).getState().equals(Square.State.WHITE) ){
-
-                filled++;
-
-                } else if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)) empty++;
+                    filled++;
+                } else if (board.getSquare(i,j).getState().equals(Square.State.EMPTY))
+                    empty++;
             }
 
         if (filled>0 && empty == 0) {
-
             for (int i = 0; i < 10; i++)
                 for (int j = 0; j < 10; j++){
-                        if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
-
-                            row.add(new TreeNode(i, j, engine.checkValueOfArea(i, j, board) + weight));
-
-                        }
-                }
-
-        } else {
-
-
-        for (int i = x-1; i <= x+1; i++)
-            for (int j = y-1; j <= y+1; j++){
-                if (i>=0 && i<10 && j>=0 && j<10 && board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
-
+                    if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
                         row.add(new TreeNode(i, j, engine.checkValueOfArea(i, j, board) + weight));
-
-            }
-            }
+                    }
+                }
+        } else {
+            for (int i = x-1; i <= x+1; i++)
+                for (int j = y-1; j <= y+1; j++){
+                    if (i>=0 && i<10 && j>=0 && j<10 && board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
+                            row.add(new TreeNode(i, j, engine.checkValueOfArea(i, j, board) + weight));
+                    }
+                }
         }
         return row;
     }
