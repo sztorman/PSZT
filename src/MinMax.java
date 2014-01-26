@@ -54,17 +54,16 @@ public class MinMax {
 
 
 
-    public int MinaMaxAlgorithm(int depth, int x, int y, int weight, Board newBoard, boolean maxPlayer, int alpha, int beta){
+    public int MinaMaxAlgorithm(int depth, int x, int y, int weight, Board board, boolean maxPlayer, int alpha, int beta){
 
         int bestValue = 0;
         int value = 0;
-        Board newBoardB = newBoard;
 
-        if (depth == 0) return engine.checkValueOfArea(x, y, newBoardB);
+        if (depth == 0) return engine.checkValueOfArea(x, y, board);
         if (maxPlayer){
             bestValue= -1000;
-            for (TreeNode node: generateMove(x, y, newBoard, weight)){
-                alpha = Math.max(alpha, MinaMaxAlgorithm(depth - 1, node.getX(), node.getY(), node.getWeight(), newBoardB, false, alpha, beta));
+            for (TreeNode node: generateMove(x, y, board, weight)){
+                alpha = Math.max(alpha, MinaMaxAlgorithm(depth - 1, node.getX(), node.getY(), node.getWeight(), board, false, alpha, beta));
                 if (alpha>=beta){
                     return alpha;
                 } 
@@ -72,8 +71,8 @@ public class MinMax {
             return alpha;
         } else {
             bestValue= 1000;
-            for (TreeNode node: generateMove(x, y, newBoardB, weight)){
-                beta = Math.min(beta, MinaMaxAlgorithm(depth -1, node.getX(), node.getY(), node.getWeight(), newBoardB, true, alpha, beta));
+            for (TreeNode node: generateMove(x, y, board, weight)){
+                beta = Math.min(beta, MinaMaxAlgorithm(depth -1, node.getX(), node.getY(), node.getWeight(), board, true, alpha, beta));
                 if (alpha>=beta){
                     return beta;
                 }
