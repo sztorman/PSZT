@@ -17,9 +17,9 @@ public class MinMax {
         int empty = 0;
         int filled = 0;
 
-        for (int i = x-1;i<x+1;i++)
-            for (int j=y-1;j<y+1;j++){
-                if (i<0|| i>10 || j<0 || j>10 || board.getSquare(i,j).getState().equals(Square.State.BLACK) || board.getSquare(i,j).getState().equals(Square.State.WHITE) ){
+        for (int i = x-1; i <= x+1; i++)
+            for (int j = y-1; j <= y+1; j++){
+                if (i<0|| i>9 || j<0 || j>9 || board.getSquare(i,j).getState().equals(Square.State.BLACK) || board.getSquare(i,j).getState().equals(Square.State.WHITE) ){
 
                 filled++;
 
@@ -28,8 +28,8 @@ public class MinMax {
 
         if (filled>0 && empty == 0) {
 
-            for (int i = 0;i<10;i++)
-                for (int j=0;j<10;j++){
+            for (int i = 0; i < 10; i++)
+                for (int j = 0; j < 10; j++){
                         if (board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
 
                             row.add(new TreeNode(i, j, engine.checkValueOfArea(i, j, board) + weight));
@@ -40,8 +40,8 @@ public class MinMax {
         } else {
 
 
-        for (int i = x-1;i<x+1;i++)
-            for (int j=y-1;j<y+1;j++){
+        for (int i = x-1; i <= x+1; i++)
+            for (int j = y-1; j <= y+1; j++){
                 if (i>=0 && i<10 && j>=0 && j<10 && board.getSquare(i,j).getState().equals(Square.State.EMPTY)){
 
                         row.add(new TreeNode(i, j, engine.checkValueOfArea(i, j, board) + weight));
