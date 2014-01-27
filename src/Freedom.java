@@ -1,28 +1,3 @@
-/**
- * Copyright 2013 John Smith
- *
- * This file is part of Jewelsea Tic-Tac-Toe.
- *
- * Jewelsea Tic-Tac-Toe is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Jewelsea Tic-Tac-Toe is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Jewelsea Tic-Tac-Toe. If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact details: http://jewelsea.wordpress.com
- *
- * icon image license => creative commons with attribution:
- * http://creativecommons.org/licenses/by/3.0/
- * icon image creator attribution:
- * http://www.doublejdesign.co.uk/products-page/icons/origami-colour-pencil
- */
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -285,15 +260,6 @@ class Game {
         }
     }
 
-    private void checkForWinner() {
-        winner.set(winningStrategy.getWinner());
-        drawn.set(winningStrategy.isDrawn());
-
-        if (isDrawn()) {
-            currentPlayer.set(Square.State.EMPTY);
-        }
-    }
-
     public void boardUpdated() {
         pionkiCount++;
         if(pionkiCount == 100){
@@ -428,57 +394,6 @@ class WinningStrategy {
         this.board = board;
     }
 
-    public Square.State getWinner() {
-        for (int i = 0; i < 3; i++) {
-            int score = 0;
-            for (int j = 0; j < 3; j++) {
-                score += valueOf(i, j);
-            }
-            if (isWinning(score)) {
-                return winner(score);
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            int score = 0;
-            for (int j = 0; j < 3; j++) {
-                score += valueOf(j, i);
-            }
-            if (isWinning(score)) {
-                return winner(score);
-            }
-        }
-
-        int score = 0;
-        score += valueOf(0, 0);
-        score += valueOf(1, 1);
-        score += valueOf(2, 2);
-        if (isWinning(score)) {
-            return winner(score);
-        }
-
-        score = 0;
-        score += valueOf(2, 0);
-        score += valueOf(1, 1);
-        score += valueOf(0, 2);
-        if (isWinning(score)) {
-            return winner(score);
-        }
-
-        return Square.State.EMPTY;
-    }
-
-    public boolean isDrawn() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board.getSquare(i, j).getState() == Square.State.EMPTY) {
-                    return false;
-                }
-            }
-        }
-
-        return getWinner() == Square.State.EMPTY;
-    }
 
     private Integer valueOf(int i, int j) {
         return values.get(board.getSquare(i, j).getState());
