@@ -135,6 +135,12 @@ class GameControls extends HBox {
     }
 }
 
+class ScoresText extends Label {
+    ScoresText() {
+        getStyleClass().add("info");
+    }
+}
+
 class StatusIndicator extends HBox {
     private final ImageView playerToken = new ImageView();
     private final Label playerLabel = new Label("Current Player: ");
@@ -186,6 +192,17 @@ class StatusIndicator extends HBox {
 class Game {
 
 
+    private int pionkiCount;
+    private ScoresText scoreText;
+
+    public ScoresText getScoreText() {
+        return scoreText;
+    }
+
+    public void setScoreText(ScoresText scoreText) {
+        this.scoreText = scoreText;
+    }
+
     public enum LineDirection {
         UP, UP_LEFT, LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, RIGHT, UP_RIGHT
     }
@@ -194,6 +211,9 @@ class Game {
     private Board board = new Board(this);
     private WinningStrategy winningStrategy = new WinningStrategy(board);
     private Square lastPlacedSquare;
+
+    int whiteLines = 0;
+    int blackLines = 0;
 
     private List<ConnectingLine> lines;
 
@@ -244,8 +264,11 @@ class Game {
                         .or(drawnProperty())
         );
 
+
+        scoreText = new ScoresText();
         skin = new GameSkin(gameManager, this);
         lines = new ArrayList<>();
+        pionkiCount = 0;
     }
 
     public Board getBoard() {
@@ -272,6 +295,19 @@ class Game {
     }
 
     public void boardUpdated() {
+        pionkiCount++;
+        if(pionkiCount == 100){
+            if(blackLines > whiteLines){
+                winner.set(Square.State.BLACK);
+                currentPlayer.set(Square.State.BLACK);
+            } else if (whiteLines > blackLines){
+                winner.set(Square.State.WHITE);
+                currentPlayer.set(Square.State.WHITE);
+            } else {
+                drawn.set(true);
+                currentPlayer.set(Square.State.EMPTY);
+            }
+        }
 //        checkForWinner();
     }
 
@@ -282,6 +318,9 @@ class Game {
     public void addLine(ConnectingLine line){
         lines.add(line);
         skin.addLine(line);
+        if(line.square1.getState().equals(Square.State.WHITE)) whiteLines++;
+        else blackLines++;
+        scoreText.setText("White: " + whiteLines + ", Black: " + blackLines);
     }
 
 
@@ -355,9 +394,11 @@ class Game {
 
 class GameSkin extends VBox {
     private AnchorPane anchorPane = new AnchorPane();
+
     GameSkin(GameManager gameManager, Game game) {
         anchorPane.getChildren().add(game.getBoard().getSkin());
         getChildren().addAll(
+                game.getScoreText(),
                 anchorPane,
                 new StatusIndicator(game),
                 new GameControls(gameManager, game)
@@ -523,10 +564,10 @@ class Square {
         if(!game.isGameOver() && state.get() == State.EMPTY && ((game.canPlaceAnywhere() || game.getLastPlacedSquare().isAdjacentTo(this)))) {
             state.set(game.getCurrentPlayer());
             System.out.print(state.get() == State.WHITE ? "USER: " : "");
-            game.boardUpdated();
             game.nextTurn();
             game.setLastPlacedSquare(this);
             game.findLines(this);
+            game.boardUpdated();
             System.out.println("Placed pionek in x = " + location.getKey() + " y = " + location.getValue());
 
             GameEngine engine = new GameEngine();
